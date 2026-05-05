@@ -2,7 +2,7 @@
 services:
 
   app:
-    container_name: piousbox_local
+    container_name: {{ appliance_slug }}
     image: piousbox/php83:0.0.2
     volumes:
       - app_data:/var/www/html
@@ -22,7 +22,7 @@ services:
         source: sites
         target: /var/www/html/web/sites
     ports:
-      - 8000:80
+      - {{ app_port }}:80
     restart: 'unless-stopped'
 
 
@@ -31,17 +31,17 @@ services:
     cap_add:
       - SYS_NICE
     command:
-      # - '--default-authentication-plugin=mysql_native_password' ## this is obsolete
+      - '--default-authentication-plugin=mysql_native_password'
       - '--skip-log-bin'
     # container_name: mysql
     restart: 'unless-stopped'
     ports:
-      - "3307:3306"
+      - "{{ mysql_host_port }}:3306"
     environment:
-      MYSQL_DATABASE: "piousbox_local"
-      MYSQL_PASSWORD: "test1234"
-      MYSQL_ROOT_PASSWORD: "test1234"
-      MYSQL_USER: "root"
+      MYSQL_DATABASE: "{{ mysql_db }}"
+      MYSQL_PASSWORD: "{{ mysql_password }}"
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+      MYSQL_USER: "{{ mysql_user }}"
     volumes:
       - mysql_data:/var/lib/mysql
 
