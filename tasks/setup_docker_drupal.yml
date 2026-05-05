@@ -1,0 +1,51 @@
+---
+
+- name: check out the repo
+  ansible.builtin.git:
+    repo: "https://github.com/wasya-co/docker_drupal.git"
+    dest: "/opt/projects/docker_drupal"
+    version: "0.0.0"
+
+- name: docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml
+    dest: /opt/projects/docker_drupal/docker-compose.yml
+
+- name: settings.php
+  ansible.builtin.template:
+    src: settings.php
+    dest: /opt/projects/docker_drupal/volumes/piousbox_com/web/sites/default/settings.php
+
+
+- ansible.builtin.command: docker compose up -d
+  args:
+    chdir: /opt/projects/docker_drupal
+
+- ansible.builtin.command: docker exec app composer install
+  args:
+    chdir: /opt/projects/docker_drupal
+
+- name: Create MySQL user
+  community.mysql.mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    host: "%"
+    priv: "{{ mysql_db }}.*:ALL"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: 127.0.0.1
+
+
+
+# - name: bizplus_drupal_theme
+#   ansible.builtin.git:
+#     repo: "https://github.com/wasya-co/bizplus_drupal_module.git"
+#     dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/themes"
+#     version: "0.1.0"
+- name: piousbox_drupal_theme
+  ansible.builtin.git:
+    repo: "https://github.com/wasya-co/piousbox_drupal_theme.git"
+    dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/themes/piousbox_drupal_theme"
+    version: "1.0.0"
+

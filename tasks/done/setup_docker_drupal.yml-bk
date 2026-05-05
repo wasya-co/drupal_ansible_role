@@ -1,0 +1,16 @@
+
+# - ansible.builtin.copy:
+#     content: "{{ git_key }}"
+#     dest: "{{ git_key_path }}"
+#     mode: u=rxw,g=rx,o=r
+#     mode: '0600'
+# - name: docker_drupal
+#   ansible.builtin.git:
+#     repo: git@github.com:wasya-co/docker_drupal.git
+#     dest: /opt/projects/docker_drupal
+#     version: '0.0.0'
+#     key_file: "{{ git_key_path }}"
+#     accept_hostkey: true
+#     update: yes
+
+

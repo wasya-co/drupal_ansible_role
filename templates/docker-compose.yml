@@ -1,0 +1,51 @@
+
+services:
+
+  app:
+    container_name: piousbox_local
+    image: piousbox/php83:0.0.2
+    volumes:
+      - app_data:/var/www/html
+      - type: bind
+        source: root/_bashrc
+        target: /root/.bashrc
+      - type: bind
+        source: ./etc/apache2/sites-available/000-default-drupal.conf
+        target: /etc/apache2/sites-available/000-default.conf
+      - type: bind
+        source: composer.json
+        target: /var/www/html/composer.json
+      - type: bind
+        source: composer.lock
+        target: /var/www/html/composer.lock
+      - type: bind
+        source: sites
+        target: /var/www/html/web/sites
+    ports:
+      - 8000:80
+    restart: 'unless-stopped'
+
+
+  mysql:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    command:
+      # - '--default-authentication-plugin=mysql_native_password' ## this is obsolete
+      - '--skip-log-bin'
+    # container_name: mysql
+    restart: 'unless-stopped'
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: "piousbox_local"
+      MYSQL_PASSWORD: "test1234"
+      MYSQL_ROOT_PASSWORD: "test1234"
+      MYSQL_USER: "root"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  app_data:
+  mysql_data:
+

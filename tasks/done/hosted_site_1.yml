@@ -1,0 +1,40 @@
+
+##
+## 2026-03-30 continue for pudeyev_orbital_city
+##
+---
+- name: root dir
+  ansible.builtin.file:
+    path: /opt/projects/{{ appliance_slug }}/volumes/tmp
+    state: directory
+- name: scripts/
+  ansible.builtin.file:
+    path: /opt/projects/{{ appliance_slug }}/scripts
+    state: directory
+
+- name: login file
+  ansible.builtin.template:
+    src: opt/projects/scripts/login
+    dest: /opt/projects/{{ appliance_slug }}/scripts/login
+    mode: u=rxw,g=rx,o=r
+    # mode: '0644'
+
+- name: settings file
+  ansible.builtin.template:
+    src: opt/projects/settings.php
+    dest: /opt/projects/{{ appliance_slug }}/settings.php
+    mode: u=rxw,g=rx,o=r
+
+
+- name: docker-compose file
+  ansible.builtin.template:
+    src: opt/projects/dc_drupal.v0-0-1.yml
+    dest: /opt/projects/{{ appliance_slug }}/docker-compose.yml
+    mode: u=rw,g=r,o=r
+    # mode: '0644'
+
+- name: Start container
+  community.docker.docker_compose_v2:
+    project_src: /opt/projects/{{ appliance_slug }}
+    state: present
+  become: yes

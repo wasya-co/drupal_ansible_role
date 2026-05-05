@@ -1,0 +1,29 @@
+
+services:
+
+  {{ appliance_slug }}:
+    container_name: "{{ appliance_slug }}"
+    image: piousbox/php83:0.0.0
+    volumes:
+      - data:/var/www/html
+      - type: bind
+        source: ./settings.php
+        target: /var/www/html/sites/settings.php
+      - type: bind
+        source: ./volumes/tmp
+        target: /opt/tmp
+        consistency: delegated
+    networks:
+      - internal_net
+    ports:
+      - "{{ host_http_port }}:80"
+    restart: 'unless-stopped'
+
+
+networks:
+  internal_net:
+    external: true
+
+volumes:
+  data:
+

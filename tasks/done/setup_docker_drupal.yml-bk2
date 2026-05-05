@@ -1,0 +1,89 @@
+---
+
+- ansible.builtin.file:
+    path: "/opt/projects/docker_drupal/volumes/{{ appliance_slug }}/web/sites/default/files/config_{{ appliance_slug }}/sync"
+    state: directory
+    recurse: yes
+- ansible.builtin.file:
+    path: "/opt/projects/docker_drupal/scripts"
+    state: directory
+    recurse: yes
+
+- name: docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml
+    dest: /opt/projects/docker_drupal/docker-compose.yml
+
+- name: composer.json
+  ansible.builtin.template:
+    src: composer.json
+    dest: /opt/projects/docker_drupal/volumes/{{ appliance_slug }}/
+- name: composer.lock
+  ansible.builtin.template:
+    src: composer.lock
+    dest: /opt/projects/docker_drupal/volumes/{{ appliance_slug }}/
+- name: settings.php
+  ansible.builtin.template:
+    src: settings.php
+    dest: /opt/projects/docker_drupal/volumes/piousbox_com/web/sites/default/settings.php
+
+- name: scripts/login
+  ansible.builtin.template:
+    src: scripts/login
+    dest: /opt/projects/docker_drupal/scripts/login
+    mode: '0777'
+- name: scripts/logs
+  ansible.builtin.template:
+    src: scripts/login
+    dest: /opt/projects/docker_drupal/scripts/logs
+    mode: '0777'
+
+- name: _bashrc
+  ansible.builtin.template:
+    src: _bashrc
+    dest: /opt/projects/docker_drupal/_bashrc
+- name: 000-default-drupal.conf
+  ansible.builtin.template:
+    src: 000-default-drupal.conf
+    dest: /opt/projects/docker_drupal/000-default-drupal.conf
+
+- ansible.builtin.command: docker compose up -d
+  args:
+    chdir: /opt/projects/docker_drupal
+
+- ansible.builtin.command: docker exec piousbox_com composer install
+  args:
+    chdir: /opt/projects/docker_drupal
+
+- name: Create MySQL user
+  community.mysql.mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    host: "%"
+    priv: "{{ mysql_db }}.*:ALL"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: 127.0.0.1
+
+- name: ish_drupal_module
+  ansible.builtin.git:
+    repo: "https://github.com/wasya-co/ish_drupal_module.git"
+    dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/modules/ish_drupal_module"
+    version: "1.2.2"
+- name: vote_up_down
+  ansible.builtin.git:
+    repo: "https://github.com/wasya-co/vote_up_down.git"
+    dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/modules/ish_drupal_module"
+    version: "10.x.1.x"
+# - name: bizplus_drupal_theme
+#   ansible.builtin.git:
+#     repo: "https://github.com/wasya-co/bizplus_drupal_module.git"
+#     dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/themes"
+#     version: "0.1.0"
+- name: piousbox_drupal_theme
+  ansible.builtin.git:
+    repo: "https://github.com/wasya-co/piousbox_drupal_theme.git"
+    dest: "/opt/projects/docker_drupal/volumes/piousbox_com/web/themes/piousbox_drupal_theme"
+    version: "1.0.0"
+

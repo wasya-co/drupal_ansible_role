@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ "$#" = "0" ]; then
+  echo ""
+  echo "$0 <app name>"
+  echo ""
+  exit 2
+fi
+
+set -ex
+
+name="$1"
+
+container_id=$(docker ps --format "{{.ID}} {{.Names}}" | grep "$name" | awk '{print $1}' | head -n 1)
+
+if [ -z "$container_id" ]; then
+  echo "No container found matching: $name"
+  exit 1
+fi
+
+docker logs --tail 50 --follow --timestamps "$container_id"

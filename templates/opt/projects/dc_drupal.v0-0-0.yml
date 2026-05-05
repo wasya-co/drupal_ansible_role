@@ -1,0 +1,14 @@
+
+services:
+
+  {{ appliance_slug }}:
+    image: piousbox/php81:0.0.6-drupal
+    volumes:
+      - type: bind
+        source: ./volumes/{{ appliance_slug }}_data
+        target: /var/www/html
+    ports:
+      - {{ host_http_port }}:80
+    restart: 'on-failure'
+
+
