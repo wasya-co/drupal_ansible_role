@@ -7,7 +7,7 @@
     version: "0.0.0"
 
 - ansible.builtin.file:
-    path: "/opt/projects/docker_drupal/volumes/{{ appliance_slug }}/web/sites/default/files/config_{{ appliance_slug }}/sync"
+    path: "/opt/projects/docker_drupal/sites/default/files/config_{{ appliance_slug }}/sync"
     state: directory
     recurse: yes
 
@@ -19,12 +19,12 @@
 - name: settings.php
   ansible.builtin.template:
     src: settings.php
-    dest: /opt/projects/docker_drupal/volumes/piousbox_com/web/sites/default/settings.php
+    dest: /opt/projects/docker_drupal/sites/default/settings.php
 
 - ansible.builtin.command: docker compose up -d
   args:
     chdir: /opt/projects/docker_drupal
 
-- ansible.builtin.command: "docker exec {{ appliance_slug }} composer install"
+- ansible.builtin.command: "docker exec {{ appliance_slug }} composer update"
   args:
     chdir: /opt/projects/docker_drupal
